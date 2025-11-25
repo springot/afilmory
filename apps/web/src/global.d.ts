@@ -32,6 +32,7 @@ declare global {
 
   interface Window {
     __SITE_CONFIG__?: Partial<SiteConfig>
+    __MANIFEST__: AfilmoryManifest
   }
 }
 

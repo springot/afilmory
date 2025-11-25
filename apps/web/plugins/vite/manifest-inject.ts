@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import path from 'node:path'
 
 import type { Plugin } from 'vite'
 
@@ -16,7 +17,17 @@ export function manifestInjectPlugin(): Plugin {
 
   function getManifestContent(): string {
     try {
-      const content = readFileSync(MANIFEST_PATH, 'utf-8')
+      // First, read the content of MANIFEST_PATH
+      let content = readFileSync(MANIFEST_PATH, 'utf-8').trim()
+
+      // Check if it's a path reference (doesn't start with { or [)
+      if (!content.startsWith('{') && !content.startsWith('[')) {
+        // It's a path reference, resolve it relative to MANIFEST_PATH directory
+        const manifestDir = path.dirname(MANIFEST_PATH)
+        const actualManifestPath = path.resolve(manifestDir, content)
+        content = readFileSync(actualManifestPath, 'utf-8')
+      }
+
       return content
     } catch (error) {
       console.warn('Failed to read manifest file:', error)
